@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ tool.name }}{% endblock %}
+{% block meta_description %}{{ tool.tagline }}{% endblock %}
+{% block body_attrs %}data-tool-slug="{{ tool.slug }}"{% endblock %}
+
+{% block content %}
+<section class="detail-head">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="small mb-3">
+            <a href="{% url 'tools:explore' %}">Explore</a> <span class="text-muted">/</span>
+            <a href="{{ tool.category.get_absolute_url }}">{{ tool.category.name }}</a> <span class="text-muted">/</span> {{ tool.name }}
+        </nav>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <span class="tool-logo lg tone-{{ tool.category.order }}" aria-hidden="true">
+                <span>{{ tool.name|slice:":1"|upper }}</span>
+                <img src="https://www.google.com/s2/favicons?domain={{ tool.domain }}&amp;sz=128" alt="" onerror="this.remove()">
+            </span>
+            <div class="flex-grow-1 min-w-0">
+                <h1 class="mb-1">{{ tool.name }}</h1>
+                <p class="text-muted mb-2">{{ tool.tagline }}</p>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a class="badge-note" href="{{ tool.category.get_absolute_url }}"><i class="bi {{ tool.category.icon }}"></i> {{ tool.category.name }}</a>
+                    <span class="badge-price price-{{ tool.pricing_model }}">{{ tool.get_pricing_model_display }}</span>
+                    {% if tool.is_open_source %}<span class="badge-oss">Open source</span>{% endif %}
+                    {% if review_count %}<span class="rating-chip"><i class="bi bi-star-fill"></i> {{ avg_rating|floatformat:1 }} ({{ review_count }})</span>{% endif %}
+                    {% if not tool.data_verified %}<span class="badge-note" title="Details are sample data. Confirm on the official website."><i class="bi bi-info-circle"></i> Unverified details</span>{% endif %}
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-brand" href="{{ tool.website_url }}" target="_blank" rel="noopener noreferrer nofollow"><i class="bi bi-box-arrow-up-right me-1"></i>Visit official site</a>
+                <button type="button" class="btn btn-ghost" data-fav-btn data-slug="{{ tool.slug }}" aria-pressed="false"><i class="bi bi-heart"></i> <span class="d-none d-sm-inline">Bookmark</span></button>
+                <button type="button" class="btn btn-ghost" data-compare-btn data-slug="{{ tool.slug }}" aria-pressed="false"><i class="bi bi-columns-gap"></i> <span class="label">Compare</span></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <h2 class="h4">About {{ tool.name }}</h2>
+                <p>{{ tool.description }}</p>
+
+                <div class="illustration my-4" role="img" aria-label="Illustration of an app window">
+                    <div class="ill-window">
+                        <div class="dots"><span></span><span></span><span></span></div>
+                        <div class="d-flex align-items-center gap-2 mt-3"><i class="bi {{ tool.category.icon }}" style="color:var(--link)"></i><strong>{{ tool.name }}</strong></div>
+                        <div class="bar" style="width:90%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:80%"></div>
+                    </div>
+                    <small>Illustration, not a real screenshot</small>
+                </div>
+
+                {% if tool.features_list %}
+                <h2 class="h4 mt-4">Main features</h2>
+                <ul class="check-list">{% for feature in tool.features_list %}<li>{{ feature }}</li>{% endfor %}</ul>
+                {% endif %}
+
+                <div class="row g-4 mt-1">
+                    <div class="col-md-6">
+                        <div class="surface h-100">
+                            <h2 class="h5"><i class="bi bi-hand-thumbs-up me-1"></i>Pros</h2>
+                            <ul class="check-list mb-0">{% for item in tool.pros_list %}<li>{{ item }}</li>{% empty %}<li class="text-muted">Not listed yet</li>{% endfor %}</ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="surface h-100">
+                            <h2 class="h5"><i class="bi bi-hand-thumbs-down me-1"></i>Cons</h2>
+                            <ul class="cross-list mb-0">{% for item in tool.cons_list %}<li>{{ item }}</li>{% empty %}<li class="text-muted">Not listed yet</li>{% endfor %}</ul>
+                        </div>
+                    </div>
+                </div>
+
+                {% if tool.use_cases_list %}
+                <h2 class="h4 mt-4">Best use cases</h2>
+                <ul class="check-list">{% for item in tool.use_cases_list %}<li>{{ item }}</li>{% endfor %}</ul>
+                {% endif %}
+
+                {# ------------------------------------------------ REVIEWS #}
+                <h2 class="h4 mt-5" id="reviews">Reviews{% if review_count %} <small class="text-muted">({{ review_count }})</small>{% endif %}</h2>
+                {% for review in reviews %}
+                <div class="review">
+                    <div class="d-flex flex-wrap justify-content-between gap-2">
+                        <div>{% include 'partials/_stars.html' with value=review.rating %} <strong class="ms-2">{{ review.title }}</strong></div>
+                        <small class="text-muted">{{ review.user.username }} &middot; {{ review.created_at|date:"j M Y" }}</small>
+                    </div>
+                    <p class="mb-1 mt-2">{{ review.body|linebreaksbr }}</p>
+                    {% if review.user == user or user.is_staff %}
+                    <form method="post" action="{% url 'reviews:delete' review.pk %}" data-confirm="Delete this review?" class="d-inline">{% csrf_token %}
+                        <button class="btn btn-link btn-sm text-danger p-0" type="submit"><i class="bi bi-trash"></i> Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="empty-state"><i class="bi bi-chat-square-text"></i><h3>No reviews yet</h3><p>Be the first to share how {{ tool.name }} worked for you.</p></div>
+                {% endfor %}
+
+                <div class="surface mt-4">
+                    <h3 class="h5">{% if user_review %}Update your review{% else %}Write a review{% endif %}</h3>
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'reviews:submit' tool.slug %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        {% include 'partials/_field.html' with field=review_form.rating %}
+                        {% include 'partials/_field.html' with field=review_form.title %}
+                        {% include 'partials/_field.html' with field=review_form.body %}
+                        <button type="submit" class="btn btn-brand">{% if user_review %}Update review{% else %}Post review{% endif %}</button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted mb-3">Log in to rate and review this tool.</p>
+                    <a class="btn btn-brand btn-sm" href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <aside class="col-lg-4">
+                <div class="surface mb-4">
+                    <h2 class="h5">Pricing</h2>
+                    <p class="mb-2"><span class="badge-price price-{{ tool.pricing_model }}">{{ tool.get_pricing_model_display }}</span></p>
+                    <ul class="plain-list">
+                        <li><strong>Free plan:</strong> {% if tool.has_free_plan %}Yes{% else %}No{% endif %}</li>
+                        <li><strong>Open source:</strong> {% if tool.is_open_source %}Yes{% else %}No{% endif %}</li>
+                        {% if tool.platforms_list %}<li><strong>Platforms:</strong> {{ tool.platforms }}</li>{% endif %}
+                        <li><strong>Website:</strong> <a href="{{ tool.website_url }}" target="_blank" rel="noopener noreferrer nofollow">{{ tool.domain }}</a></li>
+                    </ul>
+                    {% if tool.pricing_note %}<p class="small text-muted mb-0">{{ tool.pricing_note }}</p>{% endif %}
+                </div>
+
+                {% if user.is_authenticated %}
+                <div class="surface mb-4">
+                    <h2 class="h5">Add to a collection</h2>
+                    {% if collections %}
+                    <form method="post" action="{% url 'favorites:collection_add' %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="slug" value="{{ tool.slug }}">
+                        <label class="visually-hidden" for="collection_id">Collection</label>
+                        <select name="collection_id" id="collection_id" class="form-select" required>
+                            {% for collection in collections %}<option value="{{ collection.pk }}">{{ collection.name }}</option>{% endfor %}
+                        </select>
+                        <button class="btn btn-brand" type="submit">Add</button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted small mb-0">You have no collections yet. <a href="{% url 'accounts:dashboard' %}#collections">Create one on your dashboard</a>.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <h2 class="h5">Similar tools</h2>
+                {% for similar in similar_tools %}
+                <div class="mb-3">{% include 'partials/_tool_card.html' with tool=similar %}</div>
+                {% empty %}
+                <p class="text-muted">No similar tools in this category yet.</p>
+                {% endfor %}
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

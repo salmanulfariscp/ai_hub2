@@ -1,0 +1,11 @@
+# Core framework (4.2 is the long-term-support release; 5.x also works)
+Django>=5.2.8,<6.1
+
+# Reads settings from the .env file
+python-dotenv>=1.0
+
+# Pure-Python MySQL driver (no C compiler needed on Windows).
+# Only used when DB_ENGINE=mysql in your .env file.
+PyMySQL>=1.1
+# Needed by PyMySQL for MySQL 8's default password login method
+cryptography>=42.0

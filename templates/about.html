@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <h1>About AI HUB</h1>
+        <p class="text-muted mb-0">A simple place to find the AI tools that fit your work.</p>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <h2 class="h4">Why AI HUB exists</h2>
+                <p>New AI tools appear every week and it is hard to know which ones are worth trying. AI HUB keeps them in one organised directory so you can search by need, compare options side by side and save the ones you like.</p>
+                <h2 class="h4 mt-4">How it works</h2>
+                <ul class="check-list">
+                    <li>Browse {{ tool_total }} tools across nine categories, or search by name.</li>
+                    <li>Filter by free plan, open source and category, then sort the results.</li>
+                    <li>Compare up to three tools on features, pricing, platforms, advantages and disadvantages.</li>
+                    <li>Take the quiz for recommendations that match your goal and budget.</li>
+                    <li>Create a free account to keep favourites, write reviews and build collections.</li>
+                </ul>
+                <h2 class="h4 mt-4">About the information</h2>
+                <p>Descriptions are written to be general, and pricing is shown only as free, freemium or paid, without prices. Plans change often, so tools marked "unverified details" should be confirmed on the official website. Ratings only come from reviews written by AI HUB members.</p>
+                <a class="btn btn-brand" href="{% url 'submissions:contact' %}">Get in touch</a>
+            </div>
+            <div class="col-lg-5">
+                <div class="surface">
+                    <h2 class="h5">What you can do here</h2>
+                    <ul class="plain-list">
+                        <li><i class="bi bi-search me-2"></i>Real-time search and filters</li>
+                        <li><i class="bi bi-columns-gap me-2"></i>Side-by-side comparison</li>
+                        <li><i class="bi bi-heart me-2"></i>Favourites and collections</li>
+                        <li><i class="bi bi-stars me-2"></i>Rules-based recommendations</li>
+                        <li><i class="bi bi-send me-2"></i>Submit your own tool</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

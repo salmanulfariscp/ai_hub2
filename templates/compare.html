@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Compare AI tools{% endblock %}
+{% block meta_description %}Compare two or three AI tools side by side: features, pricing, platforms, advantages and disadvantages.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <h1>Compare AI tools</h1>
+        <p class="text-muted mb-0">Choose two or three tools and see them side by side.</p>
+    </div>
+</section>
+
+<section class="section pt-4" id="compare-app">
+    <div class="container">
+        <div class="row g-3 mb-4" id="compare-slots"></div>
+
+        <div class="surface mb-4">
+            <div class="d-flex flex-wrap gap-2 align-items-end">
+                <div class="flex-grow-1">
+                    <label for="picker-input" class="form-label">Add a tool</label>
+                    <input type="search" id="picker-input" class="form-control" placeholder="Type a tool name…" autocomplete="off">
+                </div>
+                <button type="button" id="compare-share" class="btn btn-ghost"><i class="bi bi-link-45deg me-1"></i>Copy share link</button>
+                <button type="button" id="compare-clear" class="btn btn-ghost"><i class="bi bi-trash me-1"></i>Clear all</button>
+            </div>
+            <div id="picker-results" class="picker-results mt-3" aria-live="polite"></div>
+        </div>
+
+        <div id="compare-results"></div>
+    </div>
+</section>
+{% endblock %}

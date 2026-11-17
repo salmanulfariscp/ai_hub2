@@ -1,0 +1,8 @@
+{# Section heading with a "view all" link. Usage: {% include 'partials/_section_head.html' with title='Popular tools' subtitle='...' link=url link_text='View all' %} #}
+<div class="section-head">
+    <div>
+        <h2>{{ title }}</h2>
+        {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+    </div>
+    {% if link %}<a class="btn btn-ghost btn-sm" href="{{ link }}">{{ link_text|default:"View all" }} <i class="bi bi-arrow-right"></i></a>{% endif %}
+</div>

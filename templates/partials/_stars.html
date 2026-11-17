@@ -1,0 +1,2 @@
+{# Renders 5 stars for a whole-number rating. Usage: {% include 'partials/_stars.html' with value=review.rating %} #}
+<span class="stars" aria-label="{{ value }} out of 5">{% if value >= 1 %}★{% else %}<span class="off">★</span>{% endif %}{% if value >= 2 %}★{% else %}<span class="off">★</span>{% endif %}{% if value >= 3 %}★{% else %}<span class="off">★</span>{% endif %}{% if value >= 4 %}★{% else %}<span class="off">★</span>{% endif %}{% if value >= 5 %}★{% else %}<span class="off">★</span>{% endif %}</span>

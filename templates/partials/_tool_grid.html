@@ -1,0 +1,10 @@
+{# A row of tool cards. Usage: {% include 'partials/_tool_grid.html' with tools=popular %} #}
+<div class="row g-4">
+    {% for tool in tools %}
+    <div class="col-md-6 col-xl-3">{% include 'partials/_tool_card.html' with tool=tool %}</div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state"><i class="bi bi-inbox"></i><h3>Nothing here yet</h3><p>Tools will appear here as they are added or flagged by the admins.</p></div>
+    </div>
+    {% endfor %}
+</div>

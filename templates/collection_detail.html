@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ collection.name }}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <nav class="small mb-2"><a href="{% url 'accounts:dashboard' %}#collections">Dashboard</a> <span class="text-muted">/</span> Collections</nav>
+        <h1>{{ collection.name }}</h1>
+        {% if collection.description %}<p class="text-muted mb-0">{{ collection.description }}</p>{% endif %}
+    </div>
+</section>
+<section class="section pt-4">
+    <div class="container">
+        <div class="row g-4">
+            {% for tool in tools %}
+            <div class="col-md-6 col-xl-3">
+                {% include 'partials/_tool_card.html' with tool=tool %}
+                <form method="post" action="{% url 'favorites:collection_remove' collection.pk %}" class="mt-2">{% csrf_token %}
+                    <input type="hidden" name="slug" value="{{ tool.slug }}">
+                    <button type="submit" class="btn btn-link btn-sm text-danger p-0"><i class="bi bi-x-circle"></i> Remove from collection</button>
+                </form>
+            </div>
+            {% empty %}
+            <div class="col-12"><div class="empty-state"><i class="bi bi-folder2-open"></i><h3>This collection is empty</h3><p>Open any tool page and use "Add to a collection".</p><a class="btn btn-brand btn-sm" href="{% url 'tools:explore' %}">Explore tools</a></div></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

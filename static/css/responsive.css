@@ -1,0 +1,30 @@
+/* AI HUB - responsive rules (loaded after style.css) */
+
+@media (max-width: 991.98px) {
+    .site-nav .navbar-collapse { padding: 12px 0 16px; }
+    .site-nav .nav-link { padding: .65rem .5rem; }
+    .filter-panel { position: static; }
+    .section { padding: 56px 0; }
+    .hero { min-height: 70vh; }
+}
+
+@media (max-width: 767.98px) {
+    .section { padding: 44px 0; }
+    .section-head h2 { font-size: 1.4rem; }
+    .page-head { padding: 40px 0 22px; }
+    .hero-content { padding: 40px 8px; }
+    .search-box form { padding-left: 16px; }
+    .search-box .btn-brand { padding: .55rem 1rem; }
+    .cta-band, .auth-card { padding: 24px; }
+    .detail-head { padding: 32px 0 24px; }
+    .tool-logo.lg { width: 60px; height: 60px; flex-basis: 60px; }
+    .compare-tray { bottom: 10px; padding-left: 14px; gap: 8px; }
+}
+
+@media (max-width: 575.98px) {
+    .hero h1 { font-size: 2rem; }
+    .hero p.lead { font-size: 1rem; }
+    .choice-grid { grid-template-columns: 1fr; }
+    .auth-wrap { margin: 28px auto; }
+    .search-box .btn-brand span { display: none; }  /* icon-only search button on phones */
+}

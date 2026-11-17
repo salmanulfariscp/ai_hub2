@@ -1,0 +1,22 @@
+<section class="section section-alt" id="newsletter">
+    <div class="container">
+        <div class="cta-band">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-6">
+                    <h2 class="h3 mb-2">Get new AI tools in your inbox</h2>
+                    <p class="text-muted mb-0">Leave your email and the site owner can send you updates about newly added tools.</p>
+                </div>
+                <div class="col-lg-6">
+                    <form method="post" action="{% url 'submissions:newsletter' %}" class="d-flex flex-column flex-sm-row gap-2 needs-validation" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <label for="newsletter-email" class="visually-hidden">Email address</label>
+                        <input type="email" id="newsletter-email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required>
+                        <button type="submit" class="btn btn-brand px-4">Subscribe</button>
+                    </form>
+                    <div class="form-text mt-2">We only store your email address. No spam.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

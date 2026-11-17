@@ -1,0 +1,7 @@
+{# Renders one form field with label, help text and errors. Usage: {% include 'partials/_field.html' with field=form.email %} #}
+<div class="mb-3">
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="text-danger" aria-hidden="true"> *</span>{% endif %}</label>
+    {{ field }}
+    {% if field.help_text %}<div class="form-text small">{{ field.help_text|safe }}</div>{% endif %}
+    {% for error in field.errors %}<div class="field-error" role="alert">{{ error }}</div>{% endfor %}
+</div>

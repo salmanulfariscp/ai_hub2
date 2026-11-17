@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Page not found{% endblock %}
+{% block content %}
+<section class="section"><div class="container">
+    <div class="empty-state"><i class="bi bi-compass"></i><h3>Page not found</h3>
+    <p>The page you tried to open does not exist or has been moved.</p>
+    <a class="btn btn-brand" href="{% url 'tools:home' %}">Back to home</a> <a class="btn btn-ghost" href="{% url 'tools:explore' %}">Explore tools</a></div>
+</div></section>
+{% endblock %}

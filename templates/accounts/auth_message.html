@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="auth-wrap">
+            <div class="auth-card text-center">
+                <i class="bi {{ icon }}" style="font-size:2.6rem;color:var(--link)"></i>
+                <h1 class="h3 mt-2">{{ title }}</h1>
+                <p class="text-muted">{{ message }}</p>
+                {% if show_login %}<a class="btn btn-brand" href="{% url 'accounts:login' %}">Log in</a>
+                {% else %}<a class="btn btn-ghost" href="{% url 'tools:home' %}">Back to home</a>{% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

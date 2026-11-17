@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Discover the best AI tools{% endblock %}
+
+{% block content %}
+{# ------------------------------------------------------------ HERO #}
+<section class="hero" aria-labelledby="hero-title">
+    <video class="hero-video" autoplay muted loop playsinline aria-hidden="true">
+        <source src="{% static 'video/hero.mp4' %}" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="hero-content">
+            <h1 id="hero-title">Discover the Best <span>AI Tools</span> in One Place</h1>
+            <p class="lead">Search, compare and save the AI tools for writing, coding, design, research and more.</p>
+
+            <div class="search-box">
+                <form action="{% url 'tools:explore' %}" method="get" role="search">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input type="search" name="q" id="hero-search" placeholder="Search tools, e.g. &quot;image&quot; or &quot;coding&quot;"
+                           autocomplete="off" aria-label="Search AI tools" aria-controls="hero-suggest" aria-expanded="false">
+                    <button type="submit" class="btn btn-brand"><i class="bi bi-search d-sm-none" style="color:inherit;margin:0"></i><span>Search</span></button>
+                </form>
+                <ul class="suggest-list" id="hero-suggest" role="listbox" hidden></ul>
+            </div>
+
+            <div class="quick-chips">
+                {% for item in categories|slice:":5" %}
+                <a href="{{ item.get_absolute_url }}"><i class="bi {{ item.icon }} me-1"></i>{{ item.name }}</a>
+                {% endfor %}
+            </div>
+            <p class="hero-stats mb-0"><strong>{{ tool_total }}</strong> tools in <strong>{{ categories|length }}</strong> categories &middot; free to browse</p>
+        </div>
+    </div>
+</section>
+
+{# ------------------------------------------------------------ CATEGORIES #}
+<section class="section" id="categories">
+    <div class="container">
+        {% url 'tools:categories' as categories_url %}
+        {% include 'partials/_section_head.html' with title='Browse by category' subtitle='Pick the kind of work you want help with.' link=categories_url link_text='All categories' %}
+        <div class="row g-3">
+            {% for item in categories %}
+            <div class="col-sm-6 col-lg-4">
+                <a class="category-tile" href="{{ item.get_absolute_url }}">
+                    <span class="tile-icon"><i class="bi {{ item.icon }}"></i></span>
+                    <span><h3>{{ item.name }}</h3><small>{{ item.tool_count }} tool{{ item.tool_count|pluralize }}</small></span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ------------------------------------------------------------ POPULAR #}
+<section class="section section-alt">
+    <div class="container">
+        {% url 'tools:explore' as explore_url %}
+        {% include 'partials/_section_head.html' with title='Popular tools' subtitle='Most saved by visitors; featured tools fill in until favourites grow.' link=explore_url %}
+        {% include 'partials/_tool_grid.html' with tools=popular %}
+    </div>
+</section>
+
+{# ------------------------------------------------------------ FEATURED #}
+<section class="section">
+    <div class="container">
+        {% include 'partials/_section_head.html' with title='Featured tools' subtitle='Hand-picked by the AI HUB admins.' link=explore_url %}
+        {% include 'partials/_tool_grid.html' with tools=featured %}
+    </div>
+</section>
+
+{# ------------------------------------------------------------ TRENDING #}
+<section class="section section-alt">
+    <div class="container">
+        {% include 'partials/_section_head.html' with title='Trending tools' subtitle='An editorial flag set by the admins in Django admin.' link=explore_url %}
+        {% include 'partials/_tool_grid.html' with tools=trending %}
+    </div>
+</section>
+
+{# ------------------------------------------------------------ RECENT #}
+<section class="section">
+    <div class="container">
+        {% include 'partials/_section_head.html' with title='Recently added' subtitle='The newest additions to the directory.' link=explore_url %}
+        {% include 'partials/_tool_grid.html' with tools=recent %}
+    </div>
+</section>
+
+{# ------------------------------------------------------------ FREE #}
+<section class="section section-alt">
+    <div class="container">
+        {% include 'partials/_section_head.html' with title='Free AI tools' subtitle='Free to use or with a free plan. Check each site for current limits.' link=explore_url %}
+        {% include 'partials/_tool_grid.html' with tools=free_tools %}
+        <div class="text-center mt-4">
+            <a class="btn btn-ghost" href="{% url 'tools:explore' %}?pricing=free-plan"><i class="bi bi-gift me-1"></i>See all tools with a free plan</a>
+        </div>
+    </div>
+</section>
+
+{# ------------------------------------------------------------ RECOMMENDED #}
+<section class="section">
+    <div class="container">
+        {% url 'tools:recommendations' as quiz_url %}
+        {% include 'partials/_section_head.html' with title=recommended_title subtitle='Not sure where to start? Take the 1-minute quiz for matches based on your goal and budget.' link=quiz_url link_text='Take the quiz' %}
+        {% include 'partials/_tool_grid.html' with tools=recommended %}
+    </div>
+</section>
+
+{% include 'partials/_newsletter.html' %}
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/search.js' %}"></script>
+{% endblock %}

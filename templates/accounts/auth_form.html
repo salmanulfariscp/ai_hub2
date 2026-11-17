@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="auth-wrap">
+            <div class="auth-card">
+                {% if validlink is False %}
+                <h1 class="h3 mb-3">Link expired</h1>
+                <p class="text-muted">This password reset link is invalid or has already been used.</p>
+                <a class="btn btn-brand" href="{% url 'accounts:password_reset' %}">Request a new link</a>
+                {% else %}
+                <h1 class="h3 mb-1">{{ title }}</h1>
+                {% if subtitle %}<p class="text-muted mb-4">{{ subtitle }}</p>{% else %}<div class="mb-4"></div>{% endif %}
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    {% if page == 'login' %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                    {% for error in form.non_field_errors %}<div class="alert alert-danger py-2" role="alert">{{ error }}</div>{% endfor %}
+                    {% for field in form %}
+                        {% include 'partials/_field.html' with field=field %}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-brand w-100 mt-2">{{ button }}</button>
+                </form>
+
+                {% if page == 'login' %}
+                <p class="mt-4 mb-1 small"><a href="{% url 'accounts:password_reset' %}">Forgot your password?</a></p>
+                <p class="mb-0 small text-muted">New here? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+                {% elif page == 'register' %}
+                <p class="mt-4 mb-0 small text-muted">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+                {% elif page == 'reset' %}
+                <p class="mt-4 mb-0 small"><a href="{% url 'accounts:login' %}">Back to log in</a></p>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

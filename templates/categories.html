@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}AI tool categories{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <h1>Browse by category</h1>
+        <p class="text-muted mb-0">Every AI tool in the directory belongs to one category.</p>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="row g-4">
+            {% for item in categories %}
+            <div class="col-md-6 col-lg-4">
+                <a class="category-tile" href="{{ item.get_absolute_url }}" style="align-items:flex-start">
+                    <span class="tile-icon"><i class="bi {{ item.icon }}"></i></span>
+                    <span>
+                        <h3>{{ item.name }}</h3>
+                        <small class="d-block mb-1">{{ item.tool_count }} tool{{ item.tool_count|pluralize }}</small>
+                        <small>{{ item.description }}</small>
+                    </span>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12"><div class="empty-state"><i class="bi bi-collection"></i><h3>No categories yet</h3><p>Run <code>python manage.py seed_data</code> or add categories in the admin.</p></div></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

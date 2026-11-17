@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Your favourite tools{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <h1>Your favourites</h1>
+        <p class="text-muted mb-0">
+            {% if user.is_authenticated %}Saved to your account, so they follow you to any device.
+            {% else %}Saved in this browser. <a href="{% url 'accounts:login' %}">Log in</a> to keep them in your account.{% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="section pt-4" id="favorites-app">
+    <div class="container">
+        <div class="row g-4" id="favorites-grid"></div>
+
+        <div class="section-head mt-5">
+            <div><h2 class="h4">Recently viewed</h2><p>Tools you opened in this browser.</p></div>
+        </div>
+        <div class="row g-4" id="recent-grid"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+/* Draws the favourites and recently-viewed grids from the shared tools list. */
+(function () {
+    'use strict';
+    var favGrid = document.getElementById('favorites-grid');
+    var recentGrid = document.getElementById('recent-grid');
+    var allTools = [];
+
+    function pick(slugs) {
+        var map = {};
+        allTools.forEach(function (t) { map[t.slug] = t; });
+        return slugs.map(function (s) { return map[s]; }).filter(Boolean);
+    }
+    function draw() {
+        var favs = pick(AIHub.favorites.list());
+        if (favs.length) AIHub.renderCards(favGrid, favs);
+        else favGrid.innerHTML = '<div class="col-12">' + AIHub.emptyStateHtml('bi-heart', 'No favourites yet',
+            'Tap the heart on any tool to save it here.', '<a class="btn btn-brand btn-sm" href="' + AIHub.escapeHtml(document.body.dataset.exploreUrl) + '">Explore tools</a>') + '</div>';
+
+        var recent = pick(AIHub.readList(AIHub.KEYS.recent));
+        if (recent.length) AIHub.renderCards(recentGrid, recent.slice(0, 6));
+        else recentGrid.innerHTML = '<div class="col-12">' + AIHub.emptyStateHtml('bi-clock-history', 'Nothing viewed yet',
+            'Open a tool page and it will show up here.') + '</div>';
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        AIHub.skeletonCards(favGrid, 3);
+        AIHub.loadTools().then(function (tools) { allTools = tools; draw(); }).catch(function () {
+            favGrid.innerHTML = '<div class="col-12">' + AIHub.emptyStateHtml('bi-wifi-off', 'Could not load tools', 'Reload the page to try again.') + '</div>';
+        });
+        // Removing a favourite should remove its card straight away
+        document.addEventListener('aihub:favorites-changed', function () { if (allTools.length) draw(); });
+    });
+})();
+</script>
+{% endblock %}

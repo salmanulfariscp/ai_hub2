@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Admin statistics{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1>Admin statistics</h1>
+            <p class="text-muted mb-0">A quick overview. Add, edit, delete and approve content in Django admin.</p>
+        </div>
+        <a class="btn btn-brand" href="{% url 'admin:index' %}"><i class="bi bi-gear me-1"></i>Open Django admin</a>
+    </div>
+</section>
+
+<section class="section pt-4">
+    <div class="container">
+        <div class="row g-3 mb-4">
+            {% for label, count, icon, admin_url in stats %}
+            <div class="col-6 col-lg-3">
+                <a class="stat-card" href="{% url admin_url %}"><i class="bi {{ icon }}"></i><div><div class="num">{{ count }}</div><small class="text-muted">{{ label }}</small></div></a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if unverified_count %}
+        <div class="alert alert-info"><i class="bi bi-info-circle me-1"></i>{{ unverified_count }} tool{{ unverified_count|pluralize }} still marked as "data not verified". Check them against the official sites, then tick <em>data verified</em> in the tool's admin page.</div>
+        {% endif %}
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="surface h-100">
+                    <h2 class="h6">Pending submissions</h2>
+                    {% for item in pending %}
+                    <div class="py-2 border-bottom" style="border-color:var(--border)!important"><strong>{{ item.tool_name }}</strong><div class="small text-muted">{{ item.category.name|default:"No category" }} &middot; {{ item.created_at|date:"j M" }}</div></div>
+                    {% empty %}<p class="text-muted mb-0">Nothing waiting for review.</p>{% endfor %}
+                    <a class="btn btn-ghost btn-sm mt-3" href="{% url 'admin:submissions_toolsubmission_changelist' %}?status__exact=pending">Review submissions</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="surface h-100">
+                    <h2 class="h6">Most favourited</h2>
+                    {% for tool in top_favourited %}
+                    <div class="d-flex justify-content-between py-2"><a href="{{ tool.get_absolute_url }}">{{ tool.name }}</a><span class="text-muted">{{ tool.fav_count }}</span></div>
+                    {% empty %}<p class="text-muted mb-0">No favourites saved yet.</p>{% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="surface h-100">
+                    <h2 class="h6">Latest reviews</h2>
+                    {% for review in latest_reviews %}
+                    <div class="py-2"><a href="{{ review.tool.get_absolute_url }}#reviews">{{ review.tool.name }}</a> {% include 'partials/_stars.html' with value=review.rating %}<div class="small text-muted">by {{ review.user.username }}</div></div>
+                    {% empty %}<p class="text-muted mb-0">No reviews yet.</p>{% endfor %}
+                    <a class="btn btn-ghost btn-sm mt-3" href="{% url 'admin:reviews_review_changelist' %}">Moderate reviews</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

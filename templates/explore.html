@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if active_category %}{{ active_category.name }} tools{% else %}Explore AI tools{% endif %}{% endblock %}
+{% block meta_description %}{% if active_category %}{{ active_category.description }}{% else %}Search and filter the full AI HUB directory by category, pricing and more.{% endif %}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        {% if active_category %}
+        <nav aria-label="breadcrumb" class="small mb-2"><a href="{% url 'tools:categories' %}">Categories</a> <span class="text-muted">/</span> {{ active_category.name }}</nav>
+        <h1><i class="bi {{ active_category.icon }} me-2" style="color:var(--link)"></i>{{ active_category.name }}</h1>
+        <p class="text-muted mb-0">{{ active_category.description }}</p>
+        {% else %}
+        <h1>Explore AI tools</h1>
+        <p class="text-muted mb-0">Search the full directory and narrow it down with filters.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section pt-4" id="explorer" data-per-page="12" data-category="{% if active_category %}{{ active_category.slug }}{% endif %}">
+    <div class="container">
+        <div class="row g-4">
+            <aside class="col-lg-3">
+                <div class="filter-panel surface">
+                    <div class="mb-3">
+                        <label for="q" class="form-label">Search</label>
+                        <input type="search" id="q" class="form-control" placeholder="Name, category or platform" autocomplete="off">
+                    </div>
+                    {% if not active_category %}
+                    <div class="mb-3">
+                        <span class="form-label d-block">Category</span>
+                        <div class="cat-pills" id="category-pills">
+                            <button type="button" class="btn btn-ghost active" data-cat="" aria-pressed="true">All</button>
+                            {% for item in categories %}
+                            <button type="button" class="btn btn-ghost" data-cat="{{ item.slug }}" aria-pressed="false">{{ item.name }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="pricing" class="form-label">Pricing</label>
+                        <select id="pricing" class="form-select">
+                            <option value="any">Any pricing</option>
+                            <option value="free-plan">Has a free plan</option>
+                            <option value="free">Completely free</option>
+                            <option value="paid">Paid only</option>
+                        </select>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" role="switch" id="open-source">
+                        <label class="form-check-label" for="open-source">Open source only</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sort" class="form-label">Sort by</label>
+                        <select id="sort" class="form-select">
+                            <option value="featured">Featured first</option>
+                            <option value="name-asc">Name A to Z</option>
+                            <option value="name-desc">Name Z to A</option>
+                            <option value="newest">Newest first</option>
+                            <option value="rating">Top rated</option>
+                        </select>
+                    </div>
+                    <button type="button" id="clear-filters" class="btn btn-ghost btn-sm w-100"><i class="bi bi-arrow-counterclockwise me-1"></i>Clear filters</button>
+                </div>
+            </aside>
+            <div class="col-lg-9">
+                <div class="result-bar">
+                    <strong id="result-count" aria-live="polite">Loading tools…</strong>
+                    <span class="text-muted small">Ratings come from AI HUB reviews only.</span>
+                </div>
+                <noscript><div class="alert alert-warning">JavaScript is needed to search and filter the directory.</div></noscript>
+                <div class="row g-4" id="results"></div>
+                <div class="mt-4" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/search.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Submit an AI tool{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <h1>Submit an AI tool</h1>
+        <p class="text-muted mb-0">Built or found a great tool? Send it for review. An admin checks every submission before it is published.</p>
+    </div>
+</section>
+<section class="section pt-4">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" class="surface needs-validation" novalidate>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="row">
+                        <div class="col-md-6">{% include 'partials/_field.html' with field=form.tool_name %}</div>
+                        <div class="col-md-6">{% include 'partials/_field.html' with field=form.website_url %}</div>
+                        <div class="col-md-6">{% include 'partials/_field.html' with field=form.category %}</div>
+                        <div class="col-md-6">{% include 'partials/_field.html' with field=form.pricing_model %}</div>
+                    </div>
+                    {% include 'partials/_field.html' with field=form.short_description %}
+                    {% include 'partials/_field.html' with field=form.description %}
+                    {% include 'partials/_field.html' with field=form.features %}
+                    {% include 'partials/_field.html' with field=form.contact_email %}
+                    <button type="submit" class="btn btn-brand"><i class="bi bi-send me-1"></i>Submit for review</button>
+                </form>
+            </div>
+            <aside class="col-lg-4">
+                <div class="surface">
+                    <h2 class="h6">How review works</h2>
+                    <ol class="ps-3 mb-0 small text-muted">
+                        <li class="mb-2">You submit the tool.</li>
+                        <li class="mb-2">An admin checks the website and details.</li>
+                        <li class="mb-2">Approved tools appear in the directory. You can track the status on your dashboard.</li>
+                    </ol>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

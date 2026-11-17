@@ -1,0 +1,24 @@
+{# One tool card. Usage: {% include 'partials/_tool_card.html' with tool=tool %}  (same markup as static/js/cards.js) #}
+<article class="tool-card" data-slug="{{ tool.slug }}">
+    <div class="tool-card-head">
+        <span class="tool-logo tone-{{ tool.category.order }}" aria-hidden="true">
+            <span>{{ tool.name|slice:":1"|upper }}</span>
+            <img src="https://www.google.com/s2/favicons?domain={{ tool.domain }}&amp;sz=64" alt="" loading="lazy" onerror="this.remove()">
+        </span>
+        <div class="min-w-0">
+            <h3 class="tool-card-title"><a href="{{ tool.get_absolute_url }}">{{ tool.name }}</a></h3>
+            <span class="tool-card-cat">{{ tool.category.name }}</span>
+        </div>
+        <button type="button" class="icon-btn ms-auto" data-fav-btn data-slug="{{ tool.slug }}" aria-pressed="false" aria-label="Save {{ tool.name }} to favourites"><i class="bi bi-heart"></i></button>
+    </div>
+    <p class="tool-card-text">{{ tool.tagline }}</p>
+    <div class="tool-card-badges">
+        <span class="badge-price price-{{ tool.pricing_model }}">{{ tool.get_pricing_model_display }}</span>
+        {% if tool.is_open_source %}<span class="badge-oss">Open source</span>{% endif %}
+        {% if tool.avg_rating %}<span class="rating-chip"><i class="bi bi-star-fill"></i> {{ tool.avg_rating|floatformat:1 }}</span>{% endif %}
+    </div>
+    <div class="tool-card-actions">
+        <a class="btn btn-sm btn-ghost" href="{{ tool.get_absolute_url }}">View details</a>
+        <button type="button" class="btn btn-sm btn-ghost" data-compare-btn data-slug="{{ tool.slug }}" aria-pressed="false"><i class="bi bi-columns-gap"></i> <span class="label">Compare</span></button>
+    </div>
+</article>

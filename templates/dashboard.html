@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Your dashboard{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container d-flex flex-wrap gap-3 align-items-center">
+        <div class="avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</div>
+        <div class="flex-grow-1">
+            <h1 class="mb-1 h2">{% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}</h1>
+            <p class="text-muted mb-0">{{ user.email }}{% if user.profile.profession %} &middot; {{ user.profile.profession }}{% endif %}</p>
+            {% if user.profile.bio %}<p class="mb-0 small">{{ user.profile.bio }}</p>{% endif %}
+        </div>
+        <a class="btn btn-ghost" href="{% url 'accounts:profile' %}"><i class="bi bi-pencil me-1"></i>Edit profile</a>
+    </div>
+</section>
+
+<section class="section pt-4">
+    <div class="container">
+        <div class="row g-3 mb-5">
+            <div class="col-6 col-lg-3"><div class="stat-card"><i class="bi bi-heart"></i><div><div class="num">{{ favourite_tools|length }}</div><small class="text-muted">Favourites</small></div></div></div>
+            <div class="col-6 col-lg-3"><div class="stat-card"><i class="bi bi-folder"></i><div><div class="num">{{ collections|length }}</div><small class="text-muted">Collections</small></div></div></div>
+            <div class="col-6 col-lg-3"><div class="stat-card"><i class="bi bi-chat-square-text"></i><div><div class="num">{{ my_reviews|length }}</div><small class="text-muted">Reviews</small></div></div></div>
+            <div class="col-6 col-lg-3"><div class="stat-card"><i class="bi bi-inbox"></i><div><div class="num">{{ my_submissions|length }}</div><small class="text-muted">Submissions</small></div></div></div>
+        </div>
+
+        <h2 class="h4 mb-3" id="favorites">Favourite tools</h2>
+        {% include 'partials/_tool_grid.html' with tools=favourite_tools %}
+
+        <h2 class="h4 mt-5 mb-3">Recently viewed</h2>
+        {% include 'partials/_tool_grid.html' with tools=recent_tools %}
+
+        <h2 class="h4 mt-5 mb-3" id="collections">Collections</h2>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="surface">
+                    <h3 class="h6">New collection</h3>
+                    <form method="post" action="{% url 'favorites:collection_create' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-2"><label class="form-label" for="col-name">Name</label><input class="form-control" id="col-name" name="name" maxlength="80" required placeholder="e.g. My coding stack"></div>
+                        <div class="mb-3"><label class="form-label" for="col-desc">Description (optional)</label><input class="form-control" id="col-desc" name="description" maxlength="200"></div>
+                        <button type="submit" class="btn btn-brand btn-sm">Create collection</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                {% for collection in collections %}
+                <div class="surface mb-3 d-flex flex-wrap align-items-center gap-3">
+                    <div class="flex-grow-1">
+                        <a class="fw-semibold" href="{% url 'favorites:collection_detail' collection.pk %}">{{ collection.name }}</a>
+                        <div class="small text-muted">{{ collection.tool_count }} tool{{ collection.tool_count|pluralize }}{% if collection.description %} &middot; {{ collection.description }}{% endif %}</div>
+                    </div>
+                    <form method="post" action="{% url 'favorites:collection_delete' collection.pk %}" data-confirm="Delete this collection? The tools themselves are kept.">{% csrf_token %}
+                        <button class="btn btn-ghost btn-sm" type="submit"><i class="bi bi-trash"></i> Delete</button>
+                    </form>
+                </div>
+                {% empty %}
+                <div class="empty-state"><i class="bi bi-folder-plus"></i><h3>No collections yet</h3><p>Group tools into lists such as "Study helpers". Add tools from any tool page.</p></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <h2 class="h4 mt-5 mb-3">Your reviews</h2>
+        {% for review in my_reviews %}
+        <div class="surface mb-3">
+            <div class="d-flex flex-wrap justify-content-between gap-2">
+                <div><a class="fw-semibold" href="{{ review.tool.get_absolute_url }}#reviews">{{ review.tool.name }}</a> {% include 'partials/_stars.html' with value=review.rating %}</div>
+                <small class="text-muted">{{ review.created_at|date:"j M Y" }}{% if not review.is_approved %} &middot; hidden by an admin{% endif %}</small>
+            </div>
+            <div class="mt-1"><strong>{{ review.title }}</strong></div>
+            <p class="mb-0 text-muted">{{ review.body|truncatechars:200 }}</p>
+        </div>
+        {% empty %}
+        <div class="empty-state"><i class="bi bi-chat-square-text"></i><h3>No reviews yet</h3><p>Open a tool you have used and share your experience.</p></div>
+        {% endfor %}
+
+        <h2 class="h4 mt-5 mb-3">Your submissions</h2>
+        {% if my_submissions %}
+        <div class="table-responsive surface p-0">
+            <table class="table table-flat align-middle mb-0">
+                <thead><tr><th>Tool</th><th>Category</th><th>Status</th><th>Submitted</th></tr></thead>
+                <tbody>
+                {% for item in my_submissions %}
+                <tr><td>{{ item.tool_name }}</td><td>{{ item.category.name|default:"-" }}</td>
+                    <td>{% if item.status == 'approved' %}<span class="badge-price price-free">Approved</span>{% elif item.status == 'rejected' %}<span class="badge-price price-paid">Rejected</span>{% else %}<span class="badge-note">Pending review</span>{% endif %}</td>
+                    <td>{{ item.created_at|date:"j M Y" }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-inbox"></i><h3>No submissions yet</h3><p>Know a great AI tool that is missing? Send it in for review.</p><a class="btn btn-brand btn-sm" href="{% url 'submissions:submit' %}">Submit a tool</a></div>
+        {% endif %}
+
+        <h2 class="h4 mt-5 mb-3">Recommended for you</h2>
+        {% include 'partials/_tool_grid.html' with tools=suggestions %}
+    </div>
+</section>
+{% endblock %}
