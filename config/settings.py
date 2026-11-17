@@ -37,8 +37,11 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost
 if env_bool("DJANGO_HTTPS", False):
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 3600
+    # The host handles HTTPS before Django sees the request; this header tells Django it was secure
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # Off by default: turn on the host's own "Force HTTPS" switch instead (we do this in the deploy step)
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SSL_REDIRECT", False)
 
 # ------------------------------------------------------------ Applications
 INSTALLED_APPS = [
