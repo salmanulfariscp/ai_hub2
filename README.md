@@ -1,156 +1,105 @@
 # AI HUB - AI Tools Discovery Platform
 
-A Django web application for discovering, comparing and saving AI tools. It grew out of the original
-HTML/CSS/Bootstrap "AI HUB" site: the name, the sky-blue accent, Poppins font, hero video and category idea are kept,
-and the site now has a real backend, database, user accounts and an admin area.
+A full-stack Django web application where users can **discover, search, compare and save AI tools**.
+It started as a static HTML/CSS/Bootstrap directory and was rebuilt with a Django backend, a relational database,
+user accounts, reviews, favourites and an admin approval workflow.
 
-**Stack (only what the project brief allows):** HTML5, CSS3, Bootstrap 5, JavaScript, Bootstrap Icons, Python, Django, MySQL, Git/GitHub.
-No React / Vue / Angular / Node / TypeScript / Tailwind.
+**Live demo:** https://salmanulfariscp.pythonanywhere.com
+(Hosted on PythonAnywhere's free plan, so the first load can be slow.)
 
----
+## Screenshots
 
-## 1. One-time software you need
+| Home | Explore |
+|---|---|
+| ![Home](docs/screenshots/home.png) | ![Explore](docs/screenshots/explore.png) |
 
-| Software | Why | Check it |
-|---|---|---|
-| Python 3.10 or newer | runs Django | `python --version` |
-| Git (optional) | version control | `git --version` |
-| MySQL 8 (optional) | production database. **Not needed to try the site** - SQLite is the default | `mysql --version` |
+| Compare | Tool details |
+|---|---|
+| ![Compare](docs/screenshots/compare.png) | ![Tool details](docs/screenshots/details.png) |
 
-## 2. Quick start (SQLite, no database server needed)
+## Features
+- **Discover:** 53 AI tools in 9 categories (chatbots, image, video, writing, coding, productivity, audio, research, business).
+- **Real-time search** with suggestions, category and pricing filters, open-source filter, sorting and pagination.
+- **Compare** two or three tools side by side (pricing, free plan, platforms, features, pros and cons), with a shareable link.
+- **Recommendation quiz:** five questions ranked by transparent rules (`apps/tools/recommender.py`), no paid AI API.
+- **Accounts:** register, login, logout, password-reset flow, profile and dashboard using Django's built-in authentication.
+- **Favourites** (localStorage for guests, database for logged-in users), **collections**, **recently viewed** and **reviews with 1-5 star ratings**.
+- **Submit a tool:** validated form with an admin approval queue.
+- **Admin:** Django admin to add, edit, delete and feature tools, manage users and hide reviews, plus a staff statistics page.
+- **UI:** responsive Bootstrap 5 layout, dark and light themes, skeleton loading, empty states and toast notifications.
 
-Open a terminal in the project folder (the one containing `manage.py`).
+## Tech stack
+| Area | Technology |
+|---|---|
+| Backend | Python, Django |
+| Database | SQLite (deployed), MySQL-ready configuration via `.env` |
+| Frontend | HTML5, CSS3, Bootstrap 5, JavaScript (no framework), Bootstrap Icons |
+| Tools | Git, GitHub, PythonAnywhere |
 
-**Windows:** run `setup.bat`  **macOS / Linux:** run `bash setup.sh`
+## Database design
+- `Category` 1 -> many `Tool`
+- `User` <-> `Tool` through `Favorite` (many-to-many with its own table)
+- `Tool` 1 -> many `Review`; one review per user per tool
+- `User` 1 -> 1 `Profile` (created automatically by a signal)
+- `Collection` (user-owned) -> many `Tool`
+- `ToolSubmission` -> becomes a `Tool` when an admin approves it
 
-These scripts do exactly the commands below. You can also type them yourself:
+## Project structure
+```
+config/        settings (reads .env) and root URLs
+apps/
+  accounts/    Profile, register, profile, dashboard, staff statistics
+  tools/       Category, Tool, home/explore/details/compare, recommender, JSON API, seed data
+  favorites/   Favorite, Collection, AJAX toggle
+  reviews/     Review
+  submissions/ ToolSubmission, ContactMessage, NewsletterSubscriber
+templates/     base layout, pages, reusable partials
+static/        css/, js/ (one file per feature), video/, images/
+```
 
-```bash
-# Windows                         # macOS / Linux
-python -m venv venv               python3 -m venv venv
-venv\Scripts\activate             source venv/bin/activate
+## Run it locally (Windows)
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-copy .env.example .env            cp .env.example .env
+copy .env.example .env
 python manage.py makemigrations accounts tools favorites reviews submissions
 python manage.py migrate
-python manage.py seed_data        # loads 9 categories and 53 tools
-python manage.py createsuperuser  # your admin login (choose your own username/password)
-python manage.py runserver
+python manage.py seed_data
+python manage.py createsuperuser
+python manage.py runserver 8080
+```
+Open http://127.0.0.1:8080/ (admin at `/admin/`). On macOS/Linux use `python3` and `source venv/bin/activate`.
+
+If PowerShell blocks the activate script, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+
+### Using MySQL
+```sql
+CREATE DATABASE ai_hub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'ai_hub_user'@'localhost' IDENTIFIED BY 'choose-a-strong-password';
+GRANT ALL PRIVILEGES ON ai_hub.* TO 'ai_hub_user'@'localhost';
+```
+Then set `DB_ENGINE=mysql` and the `DB_*` values in `.env`, and repeat the migrate and seed commands.
+*The MySQL configuration is included but has not been tested in production; the live site uses SQLite.*
+
+## Tests
+```bash
+python manage.py test            # 11 Django tests: pages, JSON API, favourites, registration, reviews
+node tests/test_filters.js       # search / filter / sort / pagination logic
 ```
 
-Open **http://127.0.0.1:8000/** in your browser. Admin: **http://127.0.0.1:8000/admin/** (statistics page: `/manage/`).
-
-> **Why `makemigrations`?** Migration files describe database tables. They are created from `models.py` on your computer
-> the first time (step 4 above). After that, commit the new `apps/*/migrations/0001_initial.py` files to Git.
-
-## 3. Using MySQL instead of SQLite
-
-1. Install MySQL 8 and start it.
-2. Create the database and a user (replace the password):
-   ```sql
-   CREATE DATABASE ai_hub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'ai_hub_user'@'localhost' IDENTIFIED BY 'choose-a-strong-password';
-   GRANT ALL PRIVILEGES ON ai_hub.* TO 'ai_hub_user'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
-3. Edit `.env`:
-   ```
-   DB_ENGINE=mysql
-   DB_NAME=ai_hub
-   DB_USER=ai_hub_user
-   DB_PASSWORD=choose-a-strong-password
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   ```
-4. Run `python manage.py makemigrations accounts tools favorites reviews submissions`, `python manage.py migrate` and `python manage.py seed_data` again.
-
-The driver is **PyMySQL** (pure Python, installs on Windows without a compiler). `.env` is ignored by Git, so passwords never reach GitHub.
-
-## 4. What is in the project
-
-| Page | URL | Notes |
-|---|---|---|
-| Home | `/` | hero + live search suggestions, categories, popular, featured, trending, recent, free, recommended, newsletter |
-| Explore | `/explore/` | real-time search, category pills, pricing + open-source filters, sorting, pagination, skeleton loading, no-results state |
-| Categories | `/categories/`, `/category/<slug>/` | the 9 categories; each opens the explorer locked to that category |
-| Tool details | `/tools/<slug>/` | one template for every tool: logo, features, pros/cons, use cases, pricing, similar tools, reviews, bookmark, compare, add to collection |
-| Compare | `/compare/` | 2-3 tools side by side; shareable link `?tools=chatgpt,claude` |
-| Recommendations | `/recommendations/` | 5-question quiz, ranked by simple rules in `apps/tools/recommender.py` (no paid API) |
-| Favorites | `/favorites/` | guests: localStorage. Logged-in users: database. Guest bookmarks are copied to the account on login |
-| Auth | `/accounts/login/`, `register/`, `password-reset/`, `profile/`, `password-change/` | Django's built-in auth (hashed passwords, CSRF, sessions, validators) |
-| Dashboard | `/accounts/dashboard/` | profile, favourites, recently viewed, collections, reviews, submissions, recommendations |
-| Submit a tool | `/submit/` | login required; validated; goes to an approval queue |
-| About / Contact | `/about/`, `/contact/` | contact messages are saved and visible in admin |
-| Admin | `/admin/`, `/manage/` | Django admin for add/edit/delete tools, categories, users, reviews; approve submissions; feature tools. `/manage/` shows statistics |
-
-### Folder structure
-```
-AI-HUB/
-├── manage.py  requirements.txt  README.md  .env.example  .gitignore  setup.bat  setup.sh
-├── config/                  settings.py (reads .env), urls.py
-├── apps/
-│   ├── accounts/            Profile model, register / profile / dashboard / staff statistics
-│   ├── tools/               Category, Tool, RecentlyViewed; home, explore, details, compare, recommender, JSON API, seed data
-│   ├── favorites/           Favorite and Collection models; AJAX toggle
-│   ├── reviews/             Review model (1-5 stars)
-│   └── submissions/         ToolSubmission, ContactMessage, NewsletterSubscriber
-├── templates/               base.html, one template per page, partials/ for reusable pieces
-├── static/css/              style.css (main), responsive.css (breakpoints)
-├── static/js/               main.js, filters.js, cards.js, search.js, compare.js, favorites.js, recommendations.js
-├── static/video/hero.mp4    your original hero video
-├── scripts/check_project.py offline checker (templates, URL names, static files)
-└── tests/                   test_filters.js (Node) ; apps/tools/tests.py (Django tests)
-```
-(Categories live inside the `tools` app because a category is only a label on a tool - one app fewer to learn.)
-
-### Database relationships (the important part to understand)
-- **Category 1 → many Tool** (`Tool.category` is a `ForeignKey`). Deleting a category that still has tools is blocked (`PROTECT`).
-- **User ↔ Tool through Favorite**: a many-to-many relation with its own table; `unique_together` stops duplicates.
-- **Tool 1 → many Review**, **User 1 → many Review**; one review per user per tool.
-- **User 1 → 1 Profile** (`OneToOneField`), created automatically by a signal (`apps/accounts/signals.py`).
-- **Collection** belongs to one user and holds many tools (`ManyToManyField`).
-- **ToolSubmission**: when an admin approves one, a `Tool` is created and linked back.
-
-## 5. Data honesty
-- Descriptions are short and general. Pricing is only **free / freemium / paid** - **no prices, ratings or user counts are invented**.
-- Every seeded tool has `data_verified = False` and shows an "Unverified details" badge. Check the official site, then tick *data verified* in the admin.
-- "Featured" and "Trending" are **editorial flags** you set in the admin, not measured statistics.
+## Data notes
+- Tool descriptions are short and general. Pricing is only free / freemium / paid, with no prices, ratings or user counts.
+- Every seeded tool is marked "unverified" until an admin checks it against the official website and ticks *data verified*.
+- "Featured" and "Trending" are editorial flags set by admins, not measured statistics.
 - Ratings appear only after real users write reviews.
-- Logos are fetched at view time from Google's favicon service and fall back to the tool's initial if unavailable (needs internet).
 
-## 6. Admin tasks
-- **Add / edit / delete a tool:** Admin → Tools. **Feature it:** tick *is featured* or use the bulk action.
-- **Approve a submission:** Admin → Tool submissions → select → action *Approve selected submissions*. It is published immediately.
-- **Hide a review:** Admin → Reviews → untick *is approved* (or use the bulk action).
-- **Users:** Admin → Users. **Statistics:** `/manage/` (staff only).
+## Deployment (PythonAnywhere, free plan)
+Environment variables (`DJANGO_DEBUG=False`, secret key, allowed hosts, HTTPS) live in a server-side `.env` that is never committed.
+Static files are collected with `python manage.py collectstatic`. Free plans cannot send email, so password-reset emails
+are not delivered on the live site.
 
-## 7. Git and GitHub
-```bash
-git init
-git add .
-git commit -m "AI HUB: Django version"
-git branch -M main
-git remote add origin https://github.com/<your-username>/ai-hub.git
-git push -u origin main
-```
-`.gitignore` already excludes `.env`, `venv/`, `db.sqlite3` and caches.
-
-## 8. Testing
-```bash
-python manage.py test                # Django tests (pages, API, favourites, registration, reviews)
-node tests/test_filters.js           # search/filter/sort/pagination logic (Node.js needed)
-python scripts/check_project.py      # template tags, URL names, static files
-```
-
-## 9. Features needing extra configuration
-- **MySQL** - see section 3 (SQLite works out of the box).
-- **Password-reset email** - in development the email is printed in the terminal running `runserver`. For real email set `EMAIL_BACKEND` and the SMTP values in `.env`.
-- **Newsletter** - addresses are stored (visible in admin). The project does not send newsletters.
-- **Production** - set `DJANGO_DEBUG=False`, a long random `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DJANGO_HTTPS=True`, then run `python manage.py collectstatic` and serve with a proper web server. The hero video needs static-file serving configured there.
-- **Internet** is needed for Bootstrap, Bootstrap Icons and Google Fonts (loaded from CDNs) and for tool logos.
-
-## 10. Known limitations
-- Recommendations use transparent rules, not machine learning.
-- Explore/Compare load the whole tool list as JSON (fine for hundreds of tools; use server-side pagination if it grows to thousands).
-- Reviews are published immediately; admins can hide them afterwards.
-- No tool screenshots: the detail page shows a labelled illustration instead of invented images.
+## Known limitations
+- Recommendations use simple rules, not machine learning.
+- Explore and Compare load the full tool list as JSON, which is fine for hundreds of tools.
+- Reviews are published immediately and can be hidden by admins afterwards.
