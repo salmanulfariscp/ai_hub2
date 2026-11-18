@@ -15,7 +15,7 @@ user accounts, reviews, favourites and an admin approval workflow.
 
 | Compare | Tool details |
 |---|---|
-| ![Compare](docs/screenshots/compare.png) | ![Tool details](docs/screenshots/details.png) |
+| ![Compare](docs/screenshots/compare.png) | ![Tool details](docs/screenshots/detailed.png) |
 
 ## Features
 - **Discover:** 53 AI tools in 9 categories (chatbots, image, video, writing, coding, productivity, audio, research, business).
